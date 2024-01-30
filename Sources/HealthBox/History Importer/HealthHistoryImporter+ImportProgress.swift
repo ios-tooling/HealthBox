@@ -8,20 +8,20 @@
 import Foundation
 
 extension HealthHistoryImporter {
-	struct ImportProgress: Codable, CustomStringConvertible, CustomDebugStringConvertible {
-		enum RangeType { case month, weeks(Int) }
+	public struct ImportProgress: Codable, CustomStringConvertible, CustomDebugStringConvertible {
+		public enum RangeType { case month, weeks(Int) }
 		
-		var metricID: String
-		var latestData: Date
-		var earliestData: Date
-		var startReached = false
-		var firstDateWithNoContent: Date?
+		public var metricID: String
+		public var latestData: Date
+		public var earliestData: Date
+		public var startReached = false
+		public var firstDateWithNoContent: Date?
 		
-		var description: String {
+		public var description: String {
 			"\(metricID): \(earliestData.formatted()) - \(latestData.formatted())"
 		}
 		
-		var debugDescription: String { description }
+		public var debugDescription: String { description }
 		
 		init(metric: HealthMetric) {
 			metricID = metric.id
@@ -70,7 +70,7 @@ extension HealthHistoryImporter {
 			}
 		}
 		
-		func save() {
+		public func save() {
 			do {
 				let url = HealthHistoryImporter.instance.directory.appendingPathComponent(metricID, conformingTo: .json)
 				let data = try? JSONEncoder().encode(self)

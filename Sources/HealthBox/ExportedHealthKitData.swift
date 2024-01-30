@@ -8,13 +8,13 @@
 import Foundation
 
 public struct ExportedHealthKitData: Codable, CustomStringConvertible {
-	let dataType: String
-	let startDate: Date
-	let endDate: Date
-	let data: [HealthDataFetcher.Sample]
+	public let dataType: String
+	public let startDate: Date
+	public let endDate: Date
+	public let data: [HealthDataFetcher.Sample]
 	
 	public var description: String {
-		"\(data.count) samples, " + startDate.formatted() + " - " + endDate.formatted()
+		"\(dataType): \(data.count) samples, " + startDate.formatted() + " - " + endDate.formatted()
 	}
 	
 	public var isEmpty: Bool { data.isEmpty }

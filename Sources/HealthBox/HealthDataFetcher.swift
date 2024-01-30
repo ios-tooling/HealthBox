@@ -61,7 +61,7 @@ public class HealthDataFetcher {
 	}
 
 	public func fetch(_ metric: HealthMetric, start: Date = .earliestHealthKitDate, end: Date = .now, limit: Int = 1000000) async throws -> ExportedHealthKitData {
-		let store = HealthKitInterface.instance.healthStore
+		let store = HealthBox.instance.healthStore
 		let pred = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
 
 		guard let sampleType = metric.sampleType else { return ExportedHealthKitData(dataType: metric.name, startDate: start, endDate: end, data: []) }

@@ -12,7 +12,7 @@ import Suite
 public class HealthHistoryImporter: ObservableObject {
 	public static let instance = HealthHistoryImporter()
 	
-	func resetProgress() {
+	public func resetProgress() {
 		try? FileManager.default.removeItem(at: directory)
 		try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 	}
@@ -26,16 +26,16 @@ public class HealthHistoryImporter: ObservableObject {
 		return url
 	}()
 	
-	func history(for metric: HealthMetric) -> ImportProgress {
+	public func progress(for metric: HealthMetric) -> ImportProgress {
 		let url = directory.appendingPathComponent(metric.id, conformingTo: .json)
 		guard 
 			let data = try? Data(contentsOf: url),
-			let history = try? JSONDecoder().decode(ImportProgress.self, from: data)
+			let progress = try? JSONDecoder().decode(ImportProgress.self, from: data)
 		else {
 			return .init(metric: metric)
 		}
 		
-		return history
+		return progress
 	}
 	
 	public func resetProgress(for metric: HealthMetric) {
@@ -44,26 +44,26 @@ public class HealthHistoryImporter: ObservableObject {
 	}
 	
 	public func nextRange(for metric: HealthMetric) -> DateInterval? {
-		history(for: metric).nextRange(type: historyFetchType)
+		progress(for: metric).nextRange(type: historyFetchType)
 	}
 	
 	public func nextImport(for metric: HealthMetric) async throws -> ExportedHealthKitData? {
-		var history = history(for: metric)
-		guard let range = history.nextRange(type: historyFetchType) else { return nil }
+		var progress = progress(for: metric)
+		guard let range = progress.nextRange(type: historyFetchType) else { return nil }
 		
 		let samples = try await HealthDataFetcher.instance.fetch(metric, start: range.start, end: range.end)
 		
-		history.update(from: range)
+		progress.update(from: range)
 		if samples.isEmpty {
-			if let firstNoContentDate = history.firstDateWithNoContent {
-				history.startReached = firstNoContentDate.timeIntervalSince(range.start) > noContentEndThresholdDuration
+			if let firstNoContentDate = progress.firstDateWithNoContent {
+				progress.startReached = firstNoContentDate.timeIntervalSince(range.start) > noContentEndThresholdDuration
 			} else {
-				history.firstDateWithNoContent = range.end
+				progress.firstDateWithNoContent = range.end
 			}
 		} else {
-			history.firstDateWithNoContent = nil
+			progress.firstDateWithNoContent = nil
 		}
-		history.save()
+		progress.save()
 		return samples
 	}
 }

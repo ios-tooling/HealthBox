@@ -10,13 +10,13 @@ import HealthKit
 import SwiftUI
 import Suite
 
-public class HealthKitInterface: ObservableObject {
-	public static let instance = HealthKitInterface()
+public class HealthBox: ObservableObject {
+	public static let instance = HealthBox()
 	
 	public let healthStore = HKHealthStore()
 
 	public struct Notifications {
-		public static let didAuthorize = Notification.Name("HealthKitInterface.didAuthorize")
+		public static let didAuthorize = Notification.Name("HealthBox.didAuthorize")
 	}
 	
 	public var isAuthorized = false
@@ -55,7 +55,7 @@ public class HealthKitInterface: ObservableObject {
 			
 			self.isCheckingAuthorization = false
 			self.isAuthorized = availableMetrics.count == HealthMetric.required.count
-			if !wasAuthorized, self.isAuthorized { HealthKitInterface.Notifications.didAuthorize.notify() }
+			if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
 			self.objectWillChange.sendOnMain()
 			authorizationCheckCompleted?()
 		}

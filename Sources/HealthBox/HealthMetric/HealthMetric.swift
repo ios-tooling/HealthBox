@@ -46,15 +46,18 @@ public struct HealthMetric: Equatable {
 	}
 
 	public static func metric(with identifier: HKQuantityTypeIdentifier) -> HealthMetric? {
-		HealthMetric.all.first { $0.typeIdentifier == identifier }
+		let _ = HealthMetric.common
+		return HealthMetric.all.first { $0.typeIdentifier == identifier }
 	}
 	
 	public static func metric(with identifier: HKCategoryTypeIdentifier) -> HealthMetric? {
-		HealthMetric.all.first { $0.categoryIdentifier == identifier }
+		let _ = HealthMetric.common
+		return HealthMetric.all.first { $0.categoryIdentifier == identifier }
 	}
 	
 	public static func metric(with name: String) -> HealthMetric? {
-		HealthMetric.all.first { $0.name == name }
+		let _ = HealthMetric.common
+		return HealthMetric.all.first { $0.name == name }
 	}
 	
 }
