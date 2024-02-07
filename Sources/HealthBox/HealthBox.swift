@@ -19,46 +19,45 @@ public class HealthBox: ObservableObject {
 		public static let didAuthorize = Notification.Name("HealthBox.didAuthorize")
 	}
 	
+	enum HealthBoxError: Error, LocalizedError { case noMetricsSpecified }
+
 	public var isAuthorized = false
 	public var isCheckingAuthorization = false
 	@AppStorage("requested_healthmetrics_signature") var requestedHealthMetricsSignature = ""
 	
-	public func setup(authorizationCheckCompleted: (() -> Void)? = nil) {
-		NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+	public func setup() async {
+		await NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
 		
-		checkForAuthorization(authorizationCheckCompleted: authorizationCheckCompleted)
+		await checkForAuthorization()
 	}
 	
 	@objc func willMoveToForeground() {
-		if !isAuthorized { checkForAuthorization() }
+		if !isAuthorized { Task { await checkForAuthorization() }}
 	}
 	
-	func checkForAuthorization(authorizationCheckCompleted: (() -> Void)? = nil) {
+	func checkForAuthorization() async {
 		let wasAuthorized = isAuthorized
 		
-		Task.detached {
-			var availableMetrics: [HealthMetric] = []
-			if self.isCheckingAuthorization { return }
-			self.isCheckingAuthorization = true
-			self.objectWillChange.sendOnMain()
-			
-			let start = Date.now.addingTimeInterval(-1)
-			let end = Date.now
-			
-			for metric in HealthMetric.required {
-				do {
-					let _ = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
-					availableMetrics.append(metric)
-				} catch {
-				}
+		var availableMetrics: [HealthMetric] = []
+		if self.isCheckingAuthorization { return }
+		self.isCheckingAuthorization = true
+		self.objectWillChange.sendOnMain()
+		
+		let start = Date.now.addingTimeInterval(-1)
+		let end = Date.now
+		
+		for metric in HealthMetric.required {
+			do {
+				let _ = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
+				availableMetrics.append(metric)
+			} catch {
 			}
-			
-			self.isCheckingAuthorization = false
-			self.isAuthorized = availableMetrics.count == HealthMetric.required.count
-			if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
-			self.objectWillChange.sendOnMain()
-			authorizationCheckCompleted?()
 		}
+		
+		self.isCheckingAuthorization = false
+		self.isAuthorized = availableMetrics.count == HealthMetric.required.count
+		if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
+		self.objectWillChange.sendOnMain()
 	}
 	
 	public var hasRequestedAccess: Bool {
@@ -66,6 +65,8 @@ public class HealthBox: ObservableObject {
 	}
 	
 	public func requestAuthorization() async throws {
+		if HealthMetric.ofInterest.isEmpty { throw HealthBoxError.noMetricsSpecified }
+		
 		requestedHealthMetricsSignature = HealthMetric.ofInterest.signature
 		let readTypes: [HKSampleType] = HealthMetric.ofInterest.compactMap { $0.sampleType }
 		return try await withCheckedThrowingContinuation { continuation in
@@ -73,8 +74,10 @@ public class HealthBox: ObservableObject {
 				if let err = error {
 					continuation.resume(throwing: err)
 				} else {
-					self.checkForAuthorization()
-					continuation.resume()
+					Task {
+						await self.checkForAuthorization()
+						continuation.resume()
+					}
 				}
 			}
 		}
