@@ -9,8 +9,8 @@ import Foundation
 import HealthKit
 
 public extension HealthMetric {
-	static var ofInterest: [HealthMetric] { [] }
-	static var required: [HealthMetric] { [] }
+	static var ofInterest: [HealthMetric] = []
+	static var required: [HealthMetric] = []
 
 	static var all: [HealthMetric] = []
 	
