@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "suite",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/Suite.git",
+      "state" : {
+        "revision" : "4d379414aa81316b5a618de933d228aa0187dc68",
+        "version" : "1.0.110"
+      }
+    }
+  ],
+  "version" : 2
+}

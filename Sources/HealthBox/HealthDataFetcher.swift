@@ -73,14 +73,14 @@ public class HealthDataFetcher {
 				} else if let results = samples as? [HKQuantitySample] {
 					let mapped = results.compactMap { sample in
 						if let units = metric.units {
-							return Sample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate)
+							return Sample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata)
 						}
 						return nil
 					}
 					continuation.resume(returning: mapped)
 				} else if let results = samples as? [HKCategorySample] {
 					let mapped = results.compactMap { sample in
-						Sample(value: Double(sample.value), start: sample.startDate, end: sample.endDate)
+						Sample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata)
 					}
 					continuation.resume(returning: mapped)
 				} else {
