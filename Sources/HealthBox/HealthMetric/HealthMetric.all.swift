@@ -18,14 +18,23 @@ public extension HealthMetric {
 		if !all.contains(metric) { all.append(metric) }
 	}
 	
-	static let common: [HealthMetric] = [
-		.init(identifier: .activeEnergyBurned, units: .kilocalorie(), cumulative: true),
-		.init(identifier: .stepCount, units: .count(), cumulative: true),
-		.init(identifier: .heartRate, units: .count().unitDivided(by: .second()), cumulative: false),
+	static let heartRate = HealthMetric(identifier: .heartRate, units: .count().unitDivided(by: .second()), cumulative: false)
+	static let activeEnergyBurned = HealthMetric(identifier: .activeEnergyBurned, units: .kilocalorie(), cumulative: true)
+	static let stepCount = HealthMetric(identifier: .stepCount, units: .count(), cumulative: true)
+	
+	static let appleExerciseTime = HealthMetric(identifier: .appleExerciseTime, units: .minute(), cumulative: true)
+	static let appleMoveTime = HealthMetric(identifier: .appleMoveTime, units: .minute(), cumulative: true)
+	static let appleStandTime = HealthMetric(identifier: .appleStandTime, units: .minute(), cumulative: true)
 
-		.init(identifier: .appleExerciseTime, units: .minute(), cumulative: true),
-		.init(identifier: .appleMoveTime, units: .minute(), cumulative: true),
-		.init(identifier: .appleStandTime, units: .minute(), cumulative: true),
+	
+	static let common: [HealthMetric] = [
+		.activeEnergyBurned,
+		.stepCount,
+		.heartRate,
+		
+		.appleExerciseTime,
+		.appleMoveTime,
+		.appleStandTime,
 		
 		.init(identifier: .distanceWalkingRunning, units: .meter(), cumulative: true),
 		.init(identifier: .distanceSwimming, units: .meter(), cumulative: true),
