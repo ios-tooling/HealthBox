@@ -8,7 +8,7 @@
 import Foundation
 import HealthKit
 
-public class HealthDataFetcher {
+public actor HealthDataFetcher {
 	public static let instance = HealthDataFetcher()
 	
 	enum HealthDataFetcherError: Error, LocalizedError {

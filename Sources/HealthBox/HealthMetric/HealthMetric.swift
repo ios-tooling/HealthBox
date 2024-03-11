@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import HealthKit
+@preconcurrency import HealthKit
 
-public struct HealthMetric: Equatable {
+public struct HealthMetric: Equatable, Sendable {
 	public let typeIdentifier: HKQuantityTypeIdentifier?
 	public let categoryIdentifier: HKCategoryTypeIdentifier?
 	

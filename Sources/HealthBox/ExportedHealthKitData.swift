@@ -8,7 +8,7 @@
 import Foundation
 import Suite
 
-public struct ExportedHealthKitData: Codable, CustomStringConvertible {
+public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable {
 	public let dataType: String
 	public let startDate: Date
 	public let endDate: Date

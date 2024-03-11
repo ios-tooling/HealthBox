@@ -10,7 +10,7 @@ import HealthKit
 import SwiftUI
 import Suite
 
-public class HealthBox: ObservableObject {
+public actor HealthBox: ObservableObject {
 	public static let instance = HealthBox()
 	
 	public let healthStore = HKHealthStore()
@@ -21,9 +21,11 @@ public class HealthBox: ObservableObject {
 	
 	enum HealthBoxError: Error, LocalizedError { case noMetricsSpecified }
 
-	public var isAuthorized = false
+	public nonisolated var isAuthorized: Bool { isAuthorizedValue.value }
 	public var isCheckingAuthorization = false
 	@AppStorage("requested_healthmetrics_signature") var requestedHealthMetricsSignature = ""
+	
+	private let isAuthorizedValue: CurrentValueSubject<Bool, Never> = .init(false)
 	
 	public func setup() async {
 		await NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
@@ -31,7 +33,7 @@ public class HealthBox: ObservableObject {
 		await checkForAuthorization()
 	}
 	
-	@objc func willMoveToForeground() {
+	@objc nonisolated func willMoveToForeground() {
 		if !isAuthorized { Task { await checkForAuthorization() }}
 	}
 	
@@ -55,7 +57,7 @@ public class HealthBox: ObservableObject {
 		}
 		
 		self.isCheckingAuthorization = false
-		self.isAuthorized = availableMetrics.count == HealthMetric.required.count
+		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.count
 		if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
 		self.objectWillChange.sendOnMain()
 	}
