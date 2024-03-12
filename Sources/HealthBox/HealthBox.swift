@@ -22,8 +22,10 @@ public actor HealthBox: ObservableObject {
 	enum HealthBoxError: Error, LocalizedError { case noMetricsSpecified }
 
 	public nonisolated var isAuthorized: Bool { isAuthorizedValue.value }
-	public var isCheckingAuthorization = false
-	@AppStorage("requested_healthmetrics_signature") var requestedHealthMetricsSignature = ""
+	public nonisolated var isCheckingAuthorization: Bool { isCheckingAuthorizationSubject.value }
+	
+	let isCheckingAuthorizationSubject: CurrentValueSubject<Bool, Never> = .init(false)
+	let requestedHealthMetricsSignature: CurrentValueSubject<String?, Never> = .init(nil)
 	
 	private let isAuthorizedValue: CurrentValueSubject<Bool, Never> = .init(false)
 	
@@ -31,6 +33,10 @@ public actor HealthBox: ObservableObject {
 		await NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
 		
 		await checkForAuthorization()
+	}
+	
+	init() {
+		requestedHealthMetricsSignature.value = UserDefaults.standard.string(forKey: "requested_healthmetrics_signature")
 	}
 	
 	@objc nonisolated func willMoveToForeground() {
@@ -42,13 +48,13 @@ public actor HealthBox: ObservableObject {
 		
 		var availableMetrics: [HealthMetric] = []
 		if self.isCheckingAuthorization { return }
-		self.isCheckingAuthorization = true
+		self.isCheckingAuthorizationSubject.value = true
 		self.objectWillChange.sendOnMain()
 		
 		let start = Date.now.addingTimeInterval(-1)
 		let end = Date.now
 		
-		for metric in HealthMetric.required {
+		for metric in HealthMetric.required.value {
 			do {
 				let _ = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
 				availableMetrics.append(metric)
@@ -56,21 +62,22 @@ public actor HealthBox: ObservableObject {
 			}
 		}
 		
-		self.isCheckingAuthorization = false
-		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.count
+		self.isCheckingAuthorizationSubject.value = false
+		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.value.count
 		if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
 		self.objectWillChange.sendOnMain()
 	}
 	
-	public var hasRequestedAccess: Bool {
-		requestedHealthMetricsSignature == HealthMetric.ofInterest.signature
+	public nonisolated var hasRequestedAccess: Bool {
+		requestedHealthMetricsSignature.value == HealthMetric.ofInterest.value.signature
 	}
 	
 	public func requestAuthorization() async throws {
-		if HealthMetric.ofInterest.isEmpty { throw HealthBoxError.noMetricsSpecified }
+		if HealthMetric.ofInterest.value.isEmpty { throw HealthBoxError.noMetricsSpecified }
 		
-		requestedHealthMetricsSignature = HealthMetric.ofInterest.signature
-		let readTypes: [HKSampleType] = HealthMetric.ofInterest.compactMap { $0.sampleType }
+		requestedHealthMetricsSignature.value = HealthMetric.ofInterest.value.signature
+		UserDefaults.standard.set(HealthMetric.ofInterest.value.signature, forKey: "requested_healthmetrics_signature")
+		let readTypes: [HKSampleType] = HealthMetric.ofInterest.value.compactMap { $0.sampleType }
 		return try await withCheckedThrowingContinuation { continuation in
 			healthStore.requestAuthorization(toShare: [], read: Set(readTypes)) { success, error in
 				if let err = error {

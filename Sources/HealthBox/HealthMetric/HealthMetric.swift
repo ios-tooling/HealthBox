@@ -47,17 +47,17 @@ public struct HealthMetric: Equatable, Sendable {
 
 	public static func metric(with identifier: HKQuantityTypeIdentifier) -> HealthMetric? {
 		let _ = HealthMetric.common
-		return HealthMetric.all.first { $0.typeIdentifier == identifier }
+		return HealthMetric.all.value.first { $0.typeIdentifier == identifier }
 	}
 	
 	public static func metric(with identifier: HKCategoryTypeIdentifier) -> HealthMetric? {
 		let _ = HealthMetric.common
-		return HealthMetric.all.first { $0.categoryIdentifier == identifier }
+		return HealthMetric.all.value.first { $0.categoryIdentifier == identifier }
 	}
 	
 	public static func metric(with name: String) -> HealthMetric? {
 		let _ = HealthMetric.common
-		return HealthMetric.all.first { $0.name == name }
+		return HealthMetric.all.value.first { $0.name == name }
 	}
 	
 }

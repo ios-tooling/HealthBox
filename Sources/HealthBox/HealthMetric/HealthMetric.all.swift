@@ -7,15 +7,16 @@
 
 import Foundation
 import HealthKit
+import Combine
 
 public extension HealthMetric {
-	static var ofInterest: [HealthMetric] = []
-	static var required: [HealthMetric] = []
+	static let ofInterest: CurrentValueSubject<[HealthMetric], Never> = .init([])
+	static let required: CurrentValueSubject<[HealthMetric], Never> = .init([])
 
-	static var all: [HealthMetric] = []
+	static let all: CurrentValueSubject<[HealthMetric], Never> = .init([])
 	
 	internal static func register(_ metric: HealthMetric) {
-		if !all.contains(metric) { all.append(metric) }
+		if !all.value.contains(metric) { all.value.append(metric) }
 	}
 	
 	static let heartRate = HealthMetric(identifier: .heartRate, units: .count().unitDivided(by: .second()), cumulative: false)
