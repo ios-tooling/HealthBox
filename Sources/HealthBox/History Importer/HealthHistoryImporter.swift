@@ -9,7 +9,7 @@ import Foundation
 import HealthKit
 import Suite
 
-public class HealthHistoryImporter: ObservableObject {
+public actor HealthHistoryImporter: ObservableObject {
 	public static let instance = HealthHistoryImporter()
 	
 	public func resetProgress() {
