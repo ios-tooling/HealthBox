@@ -10,7 +10,7 @@ import HealthKit
 import Suite
 
 extension HealthDataFetcher {
-	public struct ExportedSample: Codable, Comparable, Sendable, Equatable {
+	public struct ExportedSample: Codable, Comparable, Sendable, Equatable, Hashable {
 		public let value: Double
 		public let start: Date
 		public let end: Date?
@@ -25,7 +25,14 @@ extension HealthDataFetcher {
 			self.device = DeviceInfo(device)
 		}
 		
-		public struct DeviceInfo: Codable, Equatable, Sendable {
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(device)
+			hasher.combine(start)
+			hasher.combine(end)
+			hasher.combine(value)
+		}
+		
+		public struct DeviceInfo: Codable, Equatable, Sendable, Hashable {
 			public let name: String?
 			public let manufacturer: String?
 			public let model: String?
