@@ -66,21 +66,21 @@ public actor HealthDataFetcher {
 
 		guard let sampleType = metric.sampleType else { return ExportedHealthKitData(dataType: metric.name, startDate: start, endDate: end, data: []) }
 		
-		let results: [ImportedSample] = try await withCheckedThrowingContinuation { continuation in
+		let results: [ExportedSample] = try await withCheckedThrowingContinuation { continuation in
 			let query = HKSampleQuery(sampleType: sampleType, predicate: pred, limit: limit, sortDescriptors: nil, resultsHandler: { query, samples, error in
 				if let error {
 					continuation.resume(throwing: error)
 				} else if let results = samples as? [HKQuantitySample] {
 					let mapped = results.compactMap { sample in
 						if let units = metric.units {
-							return ImportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
+							return ExportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
 						}
 						return nil
 					}
 					continuation.resume(returning: mapped)
 				} else if let results = samples as? [HKCategorySample] {
 					let mapped = results.compactMap { sample in
-						ImportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
+						ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
 					}
 					continuation.resume(returning: mapped)
 				} else {

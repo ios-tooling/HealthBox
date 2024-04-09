@@ -1,5 +1,5 @@
 //
-//  HealthDataFetcher.Sample.swift
+//  HealthDataFetcher.ExportedSample.swift
 //  HealthBox
 //
 //  Created by Ben Gottlieb on 1/5/24.
@@ -10,7 +10,7 @@ import HealthKit
 import Suite
 
 extension HealthDataFetcher {
-	public struct ImportedSample: Codable, Comparable, Sendable {
+	public struct ExportedSample: Codable, Comparable, Sendable, Equatable {
 		public let value: Double
 		public let start: Date
 		public let end: Date?

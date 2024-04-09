@@ -12,7 +12,7 @@ public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable 
 	public let dataType: String
 	public let startDate: Date
 	public let endDate: Date
-	public let data: [HealthDataFetcher.ImportedSample]
+	public let data: [HealthDataFetcher.ExportedSample]
 	
 	public var description: String {
 		"\(dataType): \(data.count) samples, " + startDate.formatted() + " - " + endDate.formatted()
@@ -23,7 +23,7 @@ public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable 
 		.init(start: startDate, end: endDate)
 	}
 	
-	public init(dataType: String, startDate: Date, endDate: Date, data: [HealthDataFetcher.ImportedSample]) {
+	public init(dataType: String, startDate: Date, endDate: Date, data: [HealthDataFetcher.ExportedSample]) {
 		self.dataType = dataType
 		self.startDate = startDate
 		self.endDate = endDate
