@@ -50,12 +50,12 @@ public actor HealthHistoryImporter: ObservableObject {
 	}
 	
 	public func nextRange(for metric: HealthMetric) -> DateInterval? {
-		progress(for: metric, lastDate: windowStartDate).nextRange(type: historyFetchType)
+		progress(for: metric, lastDate: windowStartDate).nextRange(type: historyFetchType, latestWindowDate: windowStartDate)
 	}
 	
 	public func nextImport(for metric: HealthMetric) async throws -> ExportedHealthKitData? {
 		var progress = progress(for: metric, lastDate: windowStartDate)
-		guard let range = progress.nextRange(type: historyFetchType) else { return nil }
+		guard let range = progress.nextRange(type: historyFetchType, latestWindowDate: windowStartDate) else { return nil }
 		
 		let samples = try await HealthDataFetcher.instance.fetch(metric, start: range.start, end: range.end)
 		

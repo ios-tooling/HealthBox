@@ -29,9 +29,11 @@ extension HealthHistoryImporter {
 			earliestData = date.midnight
 		}
 		
-		func nextRange(type: RangeType) -> DateInterval? {
-			if abs(latestData.timeIntervalSinceNow) > .hour {		// grab the latest data
-				return .init(start: latestData, end: .now)
+		func nextRange(type: RangeType, latestWindowDate: Date = .now) -> DateInterval? {
+			let ageFromWindow = latestWindowDate.timeIntervalSince(latestData)
+			
+			if ageFromWindow > .hour {		// grab the latest data
+				return .init(start: min(latestWindowDate, latestData), end: latestWindowDate)
 			}
 			
 			if startReached { return nil }
@@ -39,7 +41,7 @@ extension HealthHistoryImporter {
 			
 			switch type {
 			case .month:
-				if newEarliest.isSameMonth(as: .now) {						// grab the earlier part of this month
+				if newEarliest.isSameMonth(as: latestWindowDate) {						// grab the earlier part of this month
 					return .init(start: newEarliest.firstDayInMonth.midnight, end: newEarliest)
 				}
 				
