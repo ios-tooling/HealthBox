@@ -23,10 +23,10 @@ extension HealthHistoryImporter {
 		
 		public var debugDescription: String { description }
 		
-		init(metric: HealthMetric) {
+		init(metric: HealthMetric, date: Date = .now) {
 			metricID = metric.id
-			latestData = .now.midnight
-			earliestData = .now.midnight
+			latestData = date.midnight
+			earliestData = date.midnight
 		}
 		
 		func nextRange(type: RangeType) -> DateInterval? {

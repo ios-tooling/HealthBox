@@ -47,7 +47,7 @@ public actor HealthBox: ObservableObject {
 		let wasAuthorized = isAuthorized
 		
 		var availableMetrics: [HealthMetric] = []
-		if self.isCheckingAuthorization { return }
+		if self.isCheckingAuthorization || HealthMetric.required.value.isEmpty { return }
 		self.isCheckingAuthorizationSubject.value = true
 		self.objectWillChange.sendOnMain()
 		
@@ -76,13 +76,14 @@ public actor HealthBox: ObservableObject {
 		if HealthMetric.ofInterest.value.isEmpty { throw HealthBoxError.noMetricsSpecified }
 		
 		requestedHealthMetricsSignature.value = HealthMetric.ofInterest.value.signature
-		UserDefaults.standard.set(HealthMetric.ofInterest.value.signature, forKey: "requested_healthmetrics_signature")
 		let readTypes: [HKSampleType] = HealthMetric.ofInterest.value.compactMap { $0.sampleType }
 		return try await withCheckedThrowingContinuation { continuation in
 			healthStore.requestAuthorization(toShare: [], read: Set(readTypes)) { success, error in
 				if let err = error {
 					continuation.resume(throwing: err)
 				} else {
+					UserDefaults.standard.set(HealthMetric.ofInterest.value.signature, forKey: "requested_healthmetrics_signature")
+
 					Task {
 						await self.checkForAuthorization()
 						continuation.resume()

@@ -19,6 +19,12 @@ public actor HealthHistoryImporter: ObservableObject {
 	var historyFetchType = ImportProgress.RangeType.weeks(1)
 	var noContentEndThresholdDuration = TimeInterval.day * 30 		// assume any gap longer than 30 days means there's no more data for this metric
 	
+	public var windowStartDate: Date = .now
+	
+	public func setImportWindowDate(_ date: Date) {
+		windowStartDate = date
+	}
+	
 	let directory: URL = {
 		let url = URL.library(named: "imported_metrics")
 
@@ -26,13 +32,13 @@ public actor HealthHistoryImporter: ObservableObject {
 		return url
 	}()
 	
-	public func progress(for metric: HealthMetric) -> ImportProgress {
+	public func progress(for metric: HealthMetric, lastDate: Date) -> ImportProgress {
 		let url = directory.appendingPathComponent(metric.id, conformingTo: .json)
 		guard 
 			let data = try? Data(contentsOf: url),
 			let progress = try? JSONDecoder().decode(ImportProgress.self, from: data)
 		else {
-			return .init(metric: metric)
+			return .init(metric: metric, date: lastDate)
 		}
 		
 		return progress
@@ -44,11 +50,11 @@ public actor HealthHistoryImporter: ObservableObject {
 	}
 	
 	public func nextRange(for metric: HealthMetric) -> DateInterval? {
-		progress(for: metric).nextRange(type: historyFetchType)
+		progress(for: metric, lastDate: windowStartDate).nextRange(type: historyFetchType)
 	}
 	
 	public func nextImport(for metric: HealthMetric) async throws -> ExportedHealthKitData? {
-		var progress = progress(for: metric)
+		var progress = progress(for: metric, lastDate: windowStartDate)
 		guard let range = progress.nextRange(type: historyFetchType) else { return nil }
 		
 		let samples = try await HealthDataFetcher.instance.fetch(metric, start: range.start, end: range.end)
