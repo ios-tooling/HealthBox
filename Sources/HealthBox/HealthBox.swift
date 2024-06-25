@@ -38,6 +38,9 @@ public actor HealthBox: ObservableObject {
 	
 	init() {
 		requestedHealthMetricsSignature.value = UserDefaults.standard.string(forKey: "requested_healthmetrics_signature")
+		if requestedHealthMetricsSignature.value == HealthMetric.ofInterest.value.signature {
+			isAuthorizedValue.value = true
+		}
 	}
 	
 	@objc nonisolated func willMoveToForeground() {
@@ -45,10 +48,11 @@ public actor HealthBox: ObservableObject {
 	}
 	
 	func checkForAuthorization() async {
+		if self.isCheckingAuthorization || HealthMetric.required.value.isEmpty { return }
+
 		let wasAuthorized = isAuthorized
 		
 		var availableMetrics: [HealthMetric] = []
-		if self.isCheckingAuthorization || HealthMetric.required.value.isEmpty { return }
 		self.isCheckingAuthorizationSubject.value = true
 		self.objectWillChange.sendOnMain()
 		
@@ -65,8 +69,10 @@ public actor HealthBox: ObservableObject {
 		
 		self.isCheckingAuthorizationSubject.value = false
 		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.value.count
-		if !wasAuthorized, self.isAuthorized { HealthBox.Notifications.didAuthorize.notify() }
-		self.objectWillChange.sendOnMain()
+		if !wasAuthorized, self.isAuthorized {
+			await MainActor.run { HealthBox.Notifications.didAuthorize.notify() }
+		}
+		await MainActor.run { self.objectWillChange.sendOnMain() }
 	}
 	
 	public nonisolated var hasRequestedAccess: Bool {
