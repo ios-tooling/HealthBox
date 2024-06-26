@@ -10,13 +10,17 @@ import Foundation
 
 extension HKCategoryTypeIdentifier: Codable { }
 
-public struct HealthMetric: Equatable, Sendable, Codable {
+public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
 	enum CodingKeys: String, CodingKey { case type, category, units, cumulative }
 	public let typeIdentifier: HKQuantityTypeIdentifier?
 	public let categoryIdentifier: HKCategoryTypeIdentifier?
 	
 	public let units: HKUnit?
 	public let cumulative: Bool
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(id)
+	}
 	
 	public var id: String { typeIdentifier?.rawValue ?? categoryIdentifier?.rawValue ?? "" }
 	

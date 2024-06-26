@@ -8,12 +8,15 @@
 import Foundation
 import Suite
 
-public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable {
+public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable, Identifiable {
 	public let dataType: String
 	public let startDate: Date
 	public let endDate: Date
 	public let data: [HealthDataFetcher.ExportedSample]
-	
+	public var metric: HealthMetric? { HealthMetric.metric(with: dataType) }
+
+	public var id: String { dataType + startDate.description }
+
 	public var description: String {
 		"\(dataType): \(data.count) samples, " + startDate.formatted() + " - " + endDate.formatted()
 	}
