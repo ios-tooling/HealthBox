@@ -22,13 +22,15 @@ public actor HealthBox: ObservableObject {
 	enum HealthBoxError: Error, LocalizedError { case noMetricsSpecified }
 
 	public nonisolated var isAuthorized: Bool { isAuthorizedValue.value }
+	public nonisolated var isSettingUp: Bool { isSettingUpValue.value }
 	public nonisolated var isCheckingAuthorization: Bool { isCheckingAuthorizationSubject.value }
 	
 	let isCheckingAuthorizationSubject: CurrentValueSubject<Bool, Never> = .init(false)
 	let requestedHealthMetricsSignature: CurrentValueSubject<String?, Never> = .init(nil)
 	
 	private let isAuthorizedValue: CurrentValueSubject<Bool, Never> = .init(false)
-	
+	private let isSettingUpValue: CurrentValueSubject<Bool, Never> = .init(true)
+
 	public func setupHealthKitAccess(requiredMetrics: [HealthMetric]) async {
 		await NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
 		HealthMetric.required.value = requiredMetrics
@@ -40,6 +42,7 @@ public actor HealthBox: ObservableObject {
 		requestedHealthMetricsSignature.value = UserDefaults.standard.string(forKey: "requested_healthmetrics_signature")
 		if requestedHealthMetricsSignature.value == HealthMetric.ofInterest.value.signature {
 			isAuthorizedValue.value = true
+			isSettingUpValue.value = false
 		}
 	}
 	
@@ -72,6 +75,7 @@ public actor HealthBox: ObservableObject {
 		if !wasAuthorized, self.isAuthorized {
 			await MainActor.run { HealthBox.Notifications.didAuthorize.notify() }
 		}
+		isSettingUpValue.value = false
 		await MainActor.run { self.objectWillChange.sendOnMain() }
 	}
 	
