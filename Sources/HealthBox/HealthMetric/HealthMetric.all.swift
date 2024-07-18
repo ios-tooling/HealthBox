@@ -27,7 +27,16 @@ public extension HealthMetric {
 	static let appleMoveTime = HealthMetric(identifier: .appleMoveTime, units: .minute(), cumulative: true)
 	static let appleStandTime = HealthMetric(identifier: .appleStandTime, units: .minute(), cumulative: true)
 
-	
+	static let heartRateVariability = HealthMetric(identifier: .heartRateVariabilitySDNN, units: .secondUnit(with: .milli), cumulative: false)
+	static let sleep = HealthMetric(identifier: .sleepAnalysis)
+
+	static let distanceWalkingRunning = HealthMetric(identifier: .distanceWalkingRunning, units: .meter(), cumulative: true)
+	static let distanceSwimming = HealthMetric(identifier: .distanceSwimming, units: .meter(), cumulative: true)
+	static let distanceCycling = HealthMetric(identifier: .distanceCycling, units: .meter(), cumulative: true)
+	static let distanceWheelchair = HealthMetric(identifier: .distanceWheelchair, units: .meter(), cumulative: true)
+	static let restingHeartRate = HealthMetric(identifier: .restingHeartRate, units: .count().unitDivided(by: .second()), cumulative: false)
+	static let walkingHeartRateAverage = HealthMetric(identifier: .walkingHeartRateAverage, units: .count().unitDivided(by: .second()), cumulative: false)
+
 	static let common: [HealthMetric] = [
 		.activeEnergyBurned,
 		.stepCount,
@@ -37,14 +46,14 @@ public extension HealthMetric {
 		.appleMoveTime,
 		.appleStandTime,
 		
-		.init(identifier: .distanceWalkingRunning, units: .meter(), cumulative: true),
-		.init(identifier: .distanceSwimming, units: .meter(), cumulative: true),
-		.init(identifier: .distanceCycling, units: .meter(), cumulative: true),
-		.init(identifier: .distanceWheelchair, units: .meter(), cumulative: true),
-		.init(identifier: .restingHeartRate, units: .count().unitDivided(by: .second()), cumulative: false),
-		.init(identifier: .walkingHeartRateAverage, units: .count().unitDivided(by: .second()), cumulative: false),
+		.distanceWalkingRunning,
+		.distanceSwimming,
+		.distanceCycling,
+		.distanceWheelchair,
+		.restingHeartRate,
+		.walkingHeartRateAverage,
 
-		.init(identifier: .sleepAnalysis),
+		.sleep,
 	]
 
 }
