@@ -26,6 +26,9 @@ public extension HealthMetric {
 	static let appleExerciseTime = HealthMetric(identifier: .appleExerciseTime, units: .minute(), cumulative: true)
 	static let appleMoveTime = HealthMetric(identifier: .appleMoveTime, units: .minute(), cumulative: true)
 	static let appleStandTime = HealthMetric(identifier: .appleStandTime, units: .minute(), cumulative: true)
+	
+	@available(iOS 17.0, *)
+	static let timeInDaylight = HealthMetric(identifier: .timeInDaylight, units: .minute(), cumulative: true)
 
 	static let heartRateVariability = HealthMetric(identifier: .heartRateVariabilitySDNN, units: .secondUnit(with: .milli), cumulative: false)
 	static let sleep = HealthMetric(identifier: .sleepAnalysis)
