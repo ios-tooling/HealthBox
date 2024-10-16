@@ -32,7 +32,7 @@ public actor HealthBox: ObservableObject {
 	private let isSettingUpValue: CurrentValueSubject<Bool, Never> = .init(true)
 
 	public func setupHealthKitAccess(requiredMetrics: [HealthMetric]) async {
-		await NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
 		HealthMetric.required.value = requiredMetrics
 		
 		await checkForAuthorization()
