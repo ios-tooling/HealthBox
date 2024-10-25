@@ -105,14 +105,14 @@ public actor HealthDataFetcher {
 		} else if let results = samples as? [HKQuantitySample], !results.isEmpty {
 			let mapped = results.compactMap { sample in
 				if let units = metric.units, sample.startDate.nearestSecond != startDate.nearestSecond {
-					return ExportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
+					return ExportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
 				}
 				return nil
 			}
 			return mapped
 		} else if let results = samples as? [HKCategorySample] {
 			let mapped = results.compactMap { sample in
-				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
+				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
 			}
 			return mapped
 		} else {
@@ -126,14 +126,14 @@ public actor HealthDataFetcher {
 		} else if let results = samples {
 			let mapped = results.compactMap { sample in
 				if let units = metric.units, let quantity = sample.averageQuantity() {
-					return ExportedSample(value: quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: nil, device: nil)
+					return ExportedSample(value: quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: nil, device: nil, source: nil)
 				}
 				return nil
 			}
 			continuation.resume(returning: mapped)
 		} else if let results = samples as? [HKCategorySample] {
 			let mapped = results.compactMap { sample in
-				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device)
+				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
 			}
 			continuation.resume(returning: mapped)
 		} else {

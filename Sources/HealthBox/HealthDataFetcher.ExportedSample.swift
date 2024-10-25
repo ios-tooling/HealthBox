@@ -16,13 +16,15 @@ extension HealthDataFetcher {
 		public let end: Date?
 		public let metadata: CodableJSONDictionary?
 		public let device: DeviceInfo?
+		public let source: SourceInfo?
 		
-		init(value: Double, start: Date, end: Date?, metadata: [String: Any]?, device: HKDevice?) {
+		init(value: Double, start: Date, end: Date?, metadata: [String: Any]?, device: HKDevice?, source: HKSourceRevision?) {
 			self.value = value
 			self.start = start
 			self.end = end
 			self.metadata = CodableJSONDictionary(metadata)
-			self.device = DeviceInfo(device)
+			self.device = .init(device)
+			self.source = .init(source)
 		}
 		
 		public func hash(into hasher: inout Hasher) {
@@ -30,6 +32,24 @@ extension HealthDataFetcher {
 			hasher.combine(start)
 			hasher.combine(end)
 			hasher.combine(value)
+		}
+
+		
+		public struct SourceInfo: Codable, Equatable, Sendable, Hashable {
+			public let name: String?
+			public let identifier: String?
+			public let version: String?
+			public let productType: String?
+			public let operatingSystemVersion: String?
+			
+			init?(_ revision: HKSourceRevision?) {
+				guard let revision else { return nil }
+				name = revision.source.name
+				identifier = revision.source.bundleIdentifier
+				version = revision.version
+				productType = revision.productType
+				operatingSystemVersion = "\(revision.operatingSystemVersion)"
+			}
 		}
 		
 		public struct DeviceInfo: Codable, Equatable, Sendable, Hashable {
