@@ -48,7 +48,7 @@ extension HealthDataFetcher {
 				identifier = revision.source.bundleIdentifier
 				version = revision.version
 				productType = revision.productType
-				operatingSystemVersion = "\(revision.operatingSystemVersion)"
+				operatingSystemVersion = "\(revision.operatingSystemVersion.majorVersion).\(revision.operatingSystemVersion.minorVersion).\(revision.operatingSystemVersion.patchVersion)"
 			}
 		}
 		
