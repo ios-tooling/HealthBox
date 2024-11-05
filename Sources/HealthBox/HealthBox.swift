@@ -59,7 +59,7 @@ public actor HealthBox: ObservableObject {
 		self.isCheckingAuthorizationSubject.value = true
 		self.objectWillChange.sendOnMain()
 		
-		let start = Date.now.addingTimeInterval(-1)
+		let start = Date.now.addingTimeInterval(-.day * 365 * 5)
 		let end = Date.now
 		
 		for metric in HealthMetric.required.value {
