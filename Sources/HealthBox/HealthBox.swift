@@ -64,8 +64,8 @@ public actor HealthBox: ObservableObject {
 		
 		for metric in HealthMetric.required.value {
 			do {
-				let _ = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
-				availableMetrics.append(metric)
+				let found = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
+				if !found.isEmpty { availableMetrics.append(metric) }
 			} catch {
 			}
 		}
