@@ -59,7 +59,7 @@ public actor HealthBox: ObservableObject {
 		self.isCheckingAuthorizationSubject.value = true
 		self.objectWillChange.sendOnMain()
 		
-		let start = Date.now.addingTimeInterval(-.day * 365 * 5)
+		let start = Date.now.addingTimeInterval(-.day * 7)		// just look back a week to check for HealthKit data
 		let end = Date.now
 		
 		for metric in HealthMetric.required.value {
@@ -67,6 +67,7 @@ public actor HealthBox: ObservableObject {
 				let found = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
 				if !found.isEmpty { availableMetrics.append(metric) }
 			} catch {
+				print("Failed to check metrics for \(metric.name)")
 			}
 		}
 		
