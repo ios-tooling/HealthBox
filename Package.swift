@@ -17,7 +17,7 @@ let package = Package(
             targets: ["HealthBox"]),
     ],
 	 dependencies: [
-		 .package(url: "https://github.com/ios-tooling/Suite.git", from: "1.0.140"),
+		 .package(url: "https://github.com/ios-tooling/Suite.git", from: "1.1.11"),
 	 ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

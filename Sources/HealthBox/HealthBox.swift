@@ -26,23 +26,26 @@ public actor HealthBox: ObservableObject {
 	public nonisolated var isCheckingAuthorization: Bool { isCheckingAuthorizationSubject.value }
 	
 	let isCheckingAuthorizationSubject: CurrentValueSubject<Bool, Never> = .init(false)
-	let requestedHealthMetricsSignature: CurrentValueSubject<String?, Never> = .init(nil)
 	
 	private let isAuthorizedValue: CurrentValueSubject<Bool, Never> = .init(false)
 	private let isSettingUpValue: CurrentValueSubject<Bool, Never> = .init(true)
 
 	public func setupHealthKitAccess(requiredMetrics: [HealthMetric]) async {
 		NotificationCenter.default.addObserver(self, selector: #selector(willMoveToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-		HealthMetric.required.value = requiredMetrics
+		HealthMetric.requiredStore.value = requiredMetrics
 		
 		await checkForAuthorization()
 	}
 	
-	init() {
-		requestedHealthMetricsSignature.value = UserDefaults.standard.string(forKey: "requested_healthmetrics_signature")
-		if requestedHealthMetricsSignature.value == HealthMetric.ofInterest.value.signature {
-			isAuthorizedValue.value = true
-			isSettingUpValue.value = false
+	nonisolated func checkAuthorizationStatus() {
+		Task {
+			if (try? await self.hasRequestedAccess) == true {
+				isAuthorizedValue.value = true
+				isSettingUpValue.value = false
+			} else {
+				isAuthorizedValue.value = false
+				isSettingUpValue.value = true
+			}
 		}
 	}
 	
@@ -51,7 +54,7 @@ public actor HealthBox: ObservableObject {
 	}
 	
 	func checkForAuthorization() async {
-		if self.isCheckingAuthorization || HealthMetric.required.value.isEmpty { return }
+		if self.isCheckingAuthorization || HealthMetric.required.isEmpty { return }
 
 		let wasAuthorized = isAuthorized
 		
@@ -62,7 +65,7 @@ public actor HealthBox: ObservableObject {
 		let start = Date.now.addingTimeInterval(-.day * 7)		// just look back a week to check for HealthKit data
 		let end = Date.now
 		
-		for metric in HealthMetric.required.value {
+		for metric in HealthMetric.required {
 			do {
 				let found = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
 				if !found.isEmpty { availableMetrics.append(metric) }
@@ -72,7 +75,7 @@ public actor HealthBox: ObservableObject {
 		}
 		
 		self.isCheckingAuthorizationSubject.value = false
-		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.value.count
+		self.isAuthorizedValue.value = availableMetrics.count == HealthMetric.required.count
 		if !wasAuthorized, self.isAuthorized {
 			await MainActor.run { HealthBox.Notifications.didAuthorize.notify() }
 		}
@@ -81,20 +84,29 @@ public actor HealthBox: ObservableObject {
 	}
 	
 	public nonisolated var hasRequestedAccess: Bool {
-		requestedHealthMetricsSignature.value == HealthMetric.ofInterest.value.signature
+		get async throws {
+			if HealthMetric.ofInterest.isEmpty {
+				print("Please set your HealthMetric.ofInterest before checking for access.")
+				return false
+			}
+			let readTypes: [HKSampleType] = HealthMetric.ofInterest.compactMap { $0.sampleType }
+
+			let status = try await healthStore.statusForAuthorizationRequest(toShare: [], read: Set(readTypes))
+			
+			return status == .unnecessary
+		}
 	}
 	
 	public func requestAuthorization() async throws {
-		if HealthMetric.ofInterest.value.isEmpty { throw HealthBoxError.noMetricsSpecified }
+		if HealthMetric.ofInterest.isEmpty { throw HealthBoxError.noMetricsSpecified }
 		
-		requestedHealthMetricsSignature.value = HealthMetric.ofInterest.value.signature
-		let readTypes: [HKSampleType] = HealthMetric.ofInterest.value.compactMap { $0.sampleType }
+		let readTypes: [HKSampleType] = HealthMetric.ofInterest.compactMap { $0.sampleType }
 		return try await withCheckedThrowingContinuation { continuation in
 			healthStore.requestAuthorization(toShare: [], read: Set(readTypes)) { success, error in
 				if let err = error {
 					continuation.resume(throwing: err)
 				} else {
-					UserDefaults.standard.set(HealthMetric.ofInterest.value.signature, forKey: "requested_healthmetrics_signature")
+					UserDefaults.standard.set(HealthMetric.ofInterest.signature, forKey: "requested_healthmetrics_signature")
 
 					Task {
 						await self.checkForAuthorization()

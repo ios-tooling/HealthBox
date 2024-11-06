@@ -9,9 +9,20 @@ import Foundation
 import HealthKit
 import Combine
 
+extension HealthMetric {
+	static let ofInterestStore: CurrentValueSubject<[HealthMetric], Never> = .init([])
+	static let requiredStore: CurrentValueSubject<[HealthMetric], Never> = .init([])
+	
+	static nonisolated var ofInterest: [HealthMetric] { ofInterestStore.value }
+	static nonisolated var required: [HealthMetric] { requiredStore.value }
+	
+	public static func setMetricsOfInterest(_ metrics: [HealthMetric]) {
+		ofInterestStore.value = metrics
+		HealthBox.instance.checkAuthorizationStatus()
+	}
+}
+
 public extension HealthMetric {
-	static let ofInterest: CurrentValueSubject<[HealthMetric], Never> = .init([])
-	static let required: CurrentValueSubject<[HealthMetric], Never> = .init([])
 
 	static let all: CurrentValueSubject<[HealthMetric], Never> = .init([])
 	
