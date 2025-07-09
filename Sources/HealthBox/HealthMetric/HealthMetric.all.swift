@@ -51,6 +51,11 @@ public extension HealthMetric {
 	static let restingHeartRate = HealthMetric(identifier: .restingHeartRate, units: .count().unitDivided(by: .second()), cumulative: false)
 	static let walkingHeartRateAverage = HealthMetric(identifier: .walkingHeartRateAverage, units: .count().unitDivided(by: .second()), cumulative: false)
 
+	static let bodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false)
+	static let bodyMassIndex = HealthMetric(identifier: .bodyMassIndex, units: .count(), cumulative: false)
+	static let leanBodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false)
+	static let bloodGlucose = HealthMetric(identifier: .bloodGlucose, units: .gram().unitDivided(by: .liter()), cumulative: false)
+
 	static let common: [HealthMetric] = [
 		.activeEnergyBurned,
 		.stepCount,
