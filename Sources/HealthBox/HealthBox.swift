@@ -83,6 +83,20 @@ public actor HealthBox: ObservableObject {
 		await MainActor.run { self.objectWillChange.sendOnMain() }
 	}
 	
+	public func detectedMetrics(from list: [HealthMetric]) async -> [HealthMetric] {
+		let start = Date.now.addingTimeInterval(-.day * 7)		// just look back a week to check for HealthKit data
+		let end = Date.now
+		var found: [HealthMetric] = []
+		
+		for metric in list {
+			do {
+				let results = try await HealthDataFetcher.instance.fetch(metric, start: start, end: end, limit: 1)
+				if !results.isEmpty { found.append(metric) }
+			} catch { }
+		}
+		return found
+	}
+	
 	public nonisolated var hasRequestedAccess: Bool {
 		get async throws {
 			if HealthMetric.ofInterest.isEmpty {

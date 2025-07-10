@@ -11,9 +11,10 @@ import Foundation
 extension HKCategoryTypeIdentifier: Codable { }
 
 public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
-	enum CodingKeys: String, CodingKey { case type, category, units, cumulative }
+	enum CodingKeys: String, CodingKey { case type, category, units, cumulative, symbol }
 	public let typeIdentifier: HKQuantityTypeIdentifier?
 	public let categoryIdentifier: HKCategoryTypeIdentifier?
+	public let symbol: String?
 	
 	public let units: HKUnit?
 	public let cumulative: Bool
@@ -41,6 +42,7 @@ public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
 		}
 		
 		cumulative = try container.decode(Bool.self, forKey: .cumulative)
+		symbol = try container.decodeIfPresent(String.self, forKey: .symbol)
 	}
 	
 	public func encode(to encoder: any Encoder) throws {
@@ -59,19 +61,21 @@ public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
 		return "Unknown Metric"
 	}
 	
-	public init(identifier: HKQuantityTypeIdentifier, units: HKUnit, cumulative: Bool) {
+	public init(identifier: HKQuantityTypeIdentifier, units: HKUnit, cumulative: Bool, symbol: String?) {
 		typeIdentifier = identifier
 		categoryIdentifier = nil
 		self.units = units
 		self.cumulative = cumulative
+		self.symbol = symbol
 		Self.register(self)
 	}
 	
-	public init(identifier: HKCategoryTypeIdentifier) {
+	public init(identifier: HKCategoryTypeIdentifier, symbol: String?) {
 		categoryIdentifier = identifier
 		typeIdentifier = nil
 		self.units = nil
 		self.cumulative = false
+		self.symbol = symbol
 		Self.register(self)
 	}
 	

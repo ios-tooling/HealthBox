@@ -30,31 +30,31 @@ public extension HealthMetric {
 		if !all.value.contains(metric) { all.value.append(metric) }
 	}
 	
-	static let heartRate = HealthMetric(identifier: .heartRate, units: .count().unitDivided(by: .second()), cumulative: false)
-	static let activeEnergyBurned = HealthMetric(identifier: .activeEnergyBurned, units: .kilocalorie(), cumulative: true)
-	static let stepCount = HealthMetric(identifier: .stepCount, units: .count(), cumulative: true)
+	static let heartRate = HealthMetric(identifier: .heartRate, units: .count().unitDivided(by: .second()), cumulative: false, symbol: "heartRate")
+	static let activeEnergyBurned = HealthMetric(identifier: .activeEnergyBurned, units: .kilocalorie(), cumulative: true, symbol: "activeEnergyBurned")
+	static let stepCount = HealthMetric(identifier: .stepCount, units: .count(), cumulative: true, symbol: "stepCount")
 	
-	static let appleExerciseTime = HealthMetric(identifier: .appleExerciseTime, units: .minute(), cumulative: true)
-	static let appleMoveTime = HealthMetric(identifier: .appleMoveTime, units: .minute(), cumulative: true)
-	static let appleStandTime = HealthMetric(identifier: .appleStandTime, units: .minute(), cumulative: true)
+	static let appleExerciseTime = HealthMetric(identifier: .appleExerciseTime, units: .minute(), cumulative: true, symbol: "appleExerciseTime")
+	static let appleMoveTime = HealthMetric(identifier: .appleMoveTime, units: .minute(), cumulative: true, symbol: "appleMoveTime")
+	static let appleStandTime = HealthMetric(identifier: .appleStandTime, units: .minute(), cumulative: true, symbol: "appleStandTime")
 	
 	@available(iOS 17.0, *)
-	static let timeInDaylight = HealthMetric(identifier: .timeInDaylight, units: .minute(), cumulative: true)
+	static let timeInDaylight = HealthMetric(identifier: .timeInDaylight, units: .minute(), cumulative: true, symbol: "timeInDaylight")
 
-	static let heartRateVariability = HealthMetric(identifier: .heartRateVariabilitySDNN, units: .secondUnit(with: .milli), cumulative: false)
-	static let sleep = HealthMetric(identifier: .sleepAnalysis)
+	static let heartRateVariability = HealthMetric(identifier: .heartRateVariabilitySDNN, units: .secondUnit(with: .milli), cumulative: false, symbol: "heartRateVariabilitySDNN")
+	static let sleep = HealthMetric(identifier: .sleepAnalysis, symbol: "sleepAnalysis")
 
-	static let distanceWalkingRunning = HealthMetric(identifier: .distanceWalkingRunning, units: .meter(), cumulative: true)
-	static let distanceSwimming = HealthMetric(identifier: .distanceSwimming, units: .meter(), cumulative: true)
-	static let distanceCycling = HealthMetric(identifier: .distanceCycling, units: .meter(), cumulative: true)
-	static let distanceWheelchair = HealthMetric(identifier: .distanceWheelchair, units: .meter(), cumulative: true)
-	static let restingHeartRate = HealthMetric(identifier: .restingHeartRate, units: .count().unitDivided(by: .second()), cumulative: false)
-	static let walkingHeartRateAverage = HealthMetric(identifier: .walkingHeartRateAverage, units: .count().unitDivided(by: .second()), cumulative: false)
+	static let distanceWalkingRunning = HealthMetric(identifier: .distanceWalkingRunning, units: .meter(), cumulative: true, symbol: "distanceWalkingRunning")
+	static let distanceSwimming = HealthMetric(identifier: .distanceSwimming, units: .meter(), cumulative: true, symbol: "distanceSwimming")
+	static let distanceCycling = HealthMetric(identifier: .distanceCycling, units: .meter(), cumulative: true, symbol: "distanceCycling")
+	static let distanceWheelchair = HealthMetric(identifier: .distanceWheelchair, units: .meter(), cumulative: true, symbol: "distanceWheelchair")
+	static let restingHeartRate = HealthMetric(identifier: .restingHeartRate, units: .count().unitDivided(by: .second()), cumulative: false, symbol: "restingHeartRate")
+	static let walkingHeartRateAverage = HealthMetric(identifier: .walkingHeartRateAverage, units: .count().unitDivided(by: .second()), cumulative: false, symbol: "walkingHeartRateAverage")
 
-	static let bodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false)
-	static let bodyMassIndex = HealthMetric(identifier: .bodyMassIndex, units: .count(), cumulative: false)
-	static let leanBodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false)
-	static let bloodGlucose = HealthMetric(identifier: .bloodGlucose, units: .gram().unitDivided(by: .liter()), cumulative: false)
+	static let bodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false, symbol: "bodyMass")
+	static let bodyMassIndex = HealthMetric(identifier: .bodyMassIndex, units: .count(), cumulative: false, symbol: "bodyMassIndex")
+	static let leanBodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false, symbol: "leanBodyMass")
+	static let bloodGlucose = HealthMetric(identifier: .bloodGlucose, units: .gram().unitDivided(by: .liter()), cumulative: false, symbol: "bloodGlucose")
 
 	static let common: [HealthMetric] = [
 		.activeEnergyBurned,
