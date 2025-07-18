@@ -56,6 +56,11 @@ public extension HealthMetric {
 	static let leanBodyMass = HealthMetric(identifier: .bodyMass, units: .gram(), cumulative: false, symbol: "leanBodyMass")
 	static let bloodGlucose = HealthMetric(identifier: .bloodGlucose, units: .gram().unitDivided(by: .liter()), cumulative: false, symbol: "bloodGlucose")
 
+	static let oxygenSaturation = HealthMetric(identifier: .oxygenSaturation, units: .percent(), cumulative: false, symbol: "oxygenSaturation")
+	static let sleepingWristTemperature = HealthMetric(identifier: .appleSleepingWristTemperature, units: .degreeCelsius(), cumulative: false, symbol: "appleSleepingWristTemperature")
+	static let basalBodyTemperature = HealthMetric(identifier: .basalBodyTemperature, units: .gram().unitDivided(by: .liter()), cumulative: false, symbol: "basalBodyTemperature")
+	static let bodyTemperature = HealthMetric(identifier: .bodyTemperature, units: .degreeCelsius(), cumulative: false, symbol: "bodyTemperature")
+
 	static let common: [HealthMetric] = [
 		.activeEnergyBurned,
 		.stepCount,
