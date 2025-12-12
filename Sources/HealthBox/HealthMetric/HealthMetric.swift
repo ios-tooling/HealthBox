@@ -8,7 +8,7 @@
 import Foundation
 @preconcurrency import HealthKit
 
-extension HKCategoryTypeIdentifier: Codable { }
+extension HKCategoryTypeIdentifier: @retroactive Codable { }
 
 public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
 	enum CodingKeys: String, CodingKey { case type, category, units, cumulative, symbol }
