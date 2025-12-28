@@ -1,4 +1,5 @@
 {
+  "originHash" : "e3bca4e44abcdba7e85b6afc187a01c7505526574816625a54988c9ab21607e8",
   "pins" : [
     {
       "identity" : "suite",
@@ -19,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

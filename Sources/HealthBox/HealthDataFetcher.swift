@@ -84,6 +84,10 @@ public actor HealthDataFetcher {
 				store.execute(query)
 			} else {
 				let query = HKSampleQuery(sampleType: sampleType, predicate: pred, limit: limit, sortDescriptors: nil, resultsHandler: { query, samples, error in
+					if let error {
+						continuation.resume(throwing: error)
+						return
+					}
 					do {
 						let results = try handleResults(start, metric, query, samples, error)
 						continuation.resume(returning: results)
@@ -105,14 +109,14 @@ public actor HealthDataFetcher {
 		} else if let results = samples as? [HKQuantitySample], !results.isEmpty {
 			let mapped = results.compactMap { sample in
 				if let units = metric.units, sample.startDate.nearestSecond != startDate.nearestSecond {
-					return ExportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
+					return ExportedSample(value: sample.quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision, timeZone: sample.timeZone)
 				}
 				return nil
 			}
 			return mapped
 		} else if let results = samples as? [HKCategorySample] {
 			let mapped = results.compactMap { sample in
-				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
+				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision, timeZone: sample.timeZone)
 			}
 			return mapped
 		} else {
@@ -126,14 +130,14 @@ public actor HealthDataFetcher {
 		} else if let results = samples {
 			let mapped = results.compactMap { sample in
 				if let units = metric.units, let quantity = sample.averageQuantity() {
-					return ExportedSample(value: quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: nil, device: nil, source: nil)
+					return ExportedSample(value: quantity.doubleValue(for: units), start: sample.startDate, end: sample.endDate, metadata: nil, device: nil, source: nil, timeZone: nil)
 				}
 				return nil
 			}
 			continuation.resume(returning: mapped)
 		} else if let results = samples as? [HKCategorySample] {
 			let mapped = results.compactMap { sample in
-				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision)
+				ExportedSample(value: Double(sample.value), start: sample.startDate, end: sample.endDate, metadata: sample.metadata, device: sample.device, source: sample.sourceRevision, timeZone: sample.timeZone)
 			}
 			continuation.resume(returning: mapped)
 		} else {
