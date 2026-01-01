@@ -10,7 +10,7 @@ import Foundation
 
 extension HKCategoryTypeIdentifier: @retroactive Codable { }
 
-public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
+public struct HealthMetric: Equatable, Sendable, Codable, Hashable, Identifiable {
 	enum CodingKeys: String, CodingKey { case type, category, units, cumulative, symbol }
 	public let typeIdentifier: HKQuantityTypeIdentifier?
 	public let categoryIdentifier: HKCategoryTypeIdentifier?
@@ -23,7 +23,7 @@ public struct HealthMetric: Equatable, Sendable, Codable, Hashable {
 		hasher.combine(id)
 	}
 	
-	public var id: String { typeIdentifier?.rawValue ?? categoryIdentifier?.rawValue ?? "" }
+	public var id: String { typeIdentifier?.rawValue ?? categoryIdentifier?.rawValue ?? name }
 	
 	public init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)

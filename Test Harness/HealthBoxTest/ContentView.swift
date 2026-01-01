@@ -5,13 +5,17 @@
 //  Created by Ben Gottlieb on 12/25/25.
 //
 
-import SwiftUI
+import Suite
 import HealthBox
 
 struct ContentView: View {
 	@State var data: ExportedHealthKitData?
 	@State var isLoading = false
-	
+	@State private var startDate = Date.now.addingTimeInterval(.day * -7).midnight
+	@State private var endDate = Date.now
+	@State private var selectedMetric = HealthMetric.common[0]
+	let path = URL.document(named: "exported-data.json")
+
 	var body: some View {
 		VStack {
 			if let data {
@@ -20,21 +24,37 @@ struct ContentView: View {
 			
 			if isLoading { ProgressView() }
 			
-			Button("Health") {
+			DatePicker("Start", selection: $startDate, displayedComponents: .date)
+			DatePicker("End", selection: $endDate, displayedComponents: .date)
+			LabeledContent("Metric") {
+				Picker("Metric", selection: $selectedMetric) {
+					ForEach(HealthMetric.common) { metric in
+						Text(metric.name).tag(metric)
+					}
+				}
+			}
+
+			Button("Fetch") {
 				isLoading = true
 				Task {
 					do {
-						data = try await HealthHistoryImporter.instance.nextImport(for: .sleep)
+						data = try await HealthDataFetcher.instance.fetch(selectedMetric, start: startDate, end: endDate)
+						try data?.saveJSON(to: path)
+						print("Fetched \(data?.data.count, default: "--") values for \(selectedMetric.name)")
 					} catch {
 						print("Failed health import: \(error)")
 					}
 					isLoading = false
 				}
 			}
+			
+			if data != nil {
+				ShareLink(item: path)
+			}
 		}
 		.padding()
 		.task {
-			HealthMetric.setMetricsOfInterest([.stepCount, .heartRate, .sleep])
+			HealthMetric.setMetricsOfInterest(HealthMetric.common)
 //			await HealthBox.instance.setupHealthKitAccess(requiredMetrics: [.stepCount, .heartRate])
 			try! await HealthBox.instance.requestAuthorization()
 		}

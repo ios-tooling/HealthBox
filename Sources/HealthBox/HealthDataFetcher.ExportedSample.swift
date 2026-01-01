@@ -19,14 +19,14 @@ extension HealthDataFetcher {
 		public let source: SourceInfo?
 		public let timeZone: String?
 		
-		init(value: Double, start: Date, end: Date?, metadata: [String: Any]?, device: HKDevice?, source: HKSourceRevision?, timeZone: TimeZone?) {
+		init(value: Double, start: Date, end: Date?, metadata: [String: Any]?, device: HKDevice?, source: HKSourceRevision?, timeZone: String?) {
 			self.value = value
 			self.start = start
 			self.end = end
 			self.metadata = CodableJSONDictionary(metadata)
 			self.device = .init(device)
 			self.source = .init(source)
-			self.timeZone = timeZone?.identifier
+			self.timeZone = timeZone
 		}
 		
 		public func hash(into hasher: inout Hasher) {
