@@ -9,10 +9,10 @@ import Foundation
 import Suite
 
 public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable, Identifiable {
-	public let dataType: String
-	public let startDate: Date
-	public let endDate: Date
-	public let data: [HealthDataFetcher.ExportedSample]
+	public var dataType: String
+	public var startDate: Date
+	public var endDate: Date
+	public var data: [HealthDataFetcher.ExportedSample]
 	public var metric: HealthMetric? { HealthMetric.metric(with: dataType) }
 
 	public var id: String { dataType + startDate.description }
@@ -31,5 +31,13 @@ public struct ExportedHealthKitData: Codable, CustomStringConvertible, Sendable,
 		self.startDate = startDate
 		self.endDate = endDate
 		self.data = data
+	}
+}
+
+extension ExportedHealthKitData {
+	public func inRange(_ range: DateInterval) -> Self {
+		let newData = data.filter { sample in range.contains(sample.start) }
+		
+		return ExportedHealthKitData(dataType: dataType, startDate: startDate, endDate: endDate, data: newData)
 	}
 }

@@ -44,6 +44,11 @@ extension HealthDataFetcher {
 			public let productType: String?
 			public let operatingSystemVersion: String?
 			
+			public static func ==(lhs: Self, rhs: Self) -> Bool { lhs.identifier == rhs.identifier }
+			public func hash(into hasher: inout Hasher) {
+				hasher.combine(identifier)
+			}
+			
 			init?(_ revision: HKSourceRevision?) {
 				guard let revision else { return nil }
 				name = revision.source.name
