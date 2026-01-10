@@ -14,7 +14,7 @@ struct ContentView: View {
 	@State private var startDate = Date.now.addingTimeInterval(.day * -7).midnight
 	@State private var endDate = Date.now
 	@State private var selectedMetric = HealthMetric.common[0]
-	let path = URL.document(named: "exported-data.json")
+	var path: URL { URL.document(named: "exported-\(selectedMetric.name) \(startDate.formatted(date: .abbreviated, time: .omitted))-\(endDate.formatted(date: .abbreviated, time: .omitted)).json") }
 
 	var body: some View {
 		VStack {
@@ -39,7 +39,7 @@ struct ContentView: View {
 				Task {
 					do {
 						data = try await HealthDataFetcher.instance.fetch(selectedMetric, start: startDate, end: endDate)
-						try data?.saveJSON(to: path)
+						try data?.saveJSON(to: path, using: .iso8601Encoder)
 						print("Fetched \(data?.data.count, default: "--") values for \(selectedMetric.name)")
 					} catch {
 						print("Failed health import: \(error)")
