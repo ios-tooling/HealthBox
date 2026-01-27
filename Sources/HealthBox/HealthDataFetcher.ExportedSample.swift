@@ -11,13 +11,13 @@ import Suite
 
 extension HealthDataFetcher {
 	public struct ExportedSample: Codable, Comparable, Sendable, Equatable, Hashable {
-		public let value: Double
-		public let start: Date
-		public let end: Date?
-		public let metadata: CodableJSONDictionary?
-		public let device: DeviceInfo?
-		public let source: SourceInfo?
-		public let timezone: String?
+		public var value: Double
+		public var start: Date
+		public var end: Date?
+		public var metadata: CodableJSONDictionary?
+		public var device: DeviceInfo?
+		public var source: SourceInfo?
+		public var timezone: String?
 		
 		init(value: Double, start: Date, end: Date?, metadata: [String: Any]?, device: HKDevice?, source: HKSourceRevision?, timezone: String?) {
 			self.value = value
